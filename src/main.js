@@ -18,16 +18,22 @@ const createWindow = () => {
       nodeIntegration: true
     },
     width: 1280,
-    height: 720,
-    minwidth: 1280,
-    minheight: 720,
-    maxwidth: 1280,
-    maxheight: 720,
+    height: 850,
+    minWidth: 1280,
+    minHeight: 850,
+    maxWidth: 1280,
+    maxHeight: 850,
     darkmode: true,
+    show: false,
   });
 
   // and load the index.html of the app.
   mainWindow.loadURL(`file://${__dirname}/mainWindow.html`);
+
+  // Only show mainWindow once all page contents are prepared
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
+  });
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {
@@ -59,6 +65,3 @@ app.on('activate', () => {
     createWindow();
   }
 });
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
