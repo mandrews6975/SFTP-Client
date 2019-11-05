@@ -1,4 +1,6 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
+const fs = require('fs');
+const ssh2Client = require('ssh2').Client;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -12,15 +14,20 @@ let mainWindow;
 const createWindow = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    webPreferences: {
+      nodeIntegration: true
+    },
+    width: 1280,
+    height: 720,
+    minwidth: 1280,
+    minheight: 720,
+    maxwidth: 1280,
+    maxheight: 720,
+    darkmode: true,
   });
 
   // and load the index.html of the app.
-  mainWindow.loadURL(`file://${__dirname}/index.html`);
-
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  mainWindow.loadURL(`file://${__dirname}/mainWindow.html`);
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {

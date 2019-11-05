@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>SFTP Client</title>
+    <link rel="stylesheet" href="bootstrap/bootstrap.min.css">
+    <script type="text/javascript">
+      require('jquery');
+      require('popper.js');
+      require('bootstrap');
+      require('electron');
+    </script>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="row mt-3">
+        <div class="col">
+          <div class="input-group input-group-sm mb-2">
+            <div class="input-group-prepend">
+              <span class="input-group-text">Host:</span>
+            </div>
+            <input id="input_host" type="text" class="form-control">
+            <div class="input-group-prepend input-group-append">
+              <span class="input-group-text">Port:</span>
+            </div>
+            <input id="input_host" type="text" class="form-control">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="input-group input-group-sm">
+            <div class="input-group-prepend">
+              <span class="input-group-text">Username:</span>
+            </div>
+            <input id="input_host" type="text" class="form-control">
+            <div class="input-group-prepend input-group-append">
+              <span class="input-group-text">Password:</span>
+            </div>
+            <input id="input_host" type="text" class="form-control">
+            <button id="button_connect" type="button" class="button">Connect</button>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-3 mb-0">
+        <div class="col">
+          <h5>Local</h5>
+        </div>
+        <div class="col">
+          <h5>Remote</h5>
+        </div>
+      </div>
+      <div class="row mt-0 ml-0 mr-0 bg-light">
+        <div class="col pl-0">
+          <div class="input-group">
+            <button id="button_delete" type="button" class="button">Delete</button>
+            <button id="button_copy" type="button" class="button">Copy</button>
+            <button id="button_cut" type="button" class="button">Cut</button>
+            <button id="button_cut" type="button" class="button">Upload</button>
+          </div>
+        </div>
+        <div class="col ml-3">
+          <div class="input-group">
+            <button id="button_delete" type="button" class="button">Delete</button>
+            <button id="button_copy" type="button" class="button">Copy</button>
+            <button id="button_cut" type="button" class="button">Cut</button>
+            <button id="button_cut" type="button" class="button">Download</button>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col">
+          <h5>Console</h5>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
