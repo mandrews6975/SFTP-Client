@@ -9,6 +9,14 @@
       require('popper.js');
       require('bootstrap');
       require('electron');
+      require('electron').ipcRenderer;
+    </script>
+    <script src="js/renderer/localDirRenderer.js"></script>
+    <script src="js/renderer/remoteDirRenderer.js"></script>
+    <script src="js/renderer/consoleRenderer.js"></script>
+    <script src="js/renderer/sftpRenderer/js"></script>
+    <script type="text/javascript">
+      displayDirListing('/');
     </script>
   </head>
   <body>
@@ -84,22 +92,22 @@
                 <th>Type</th>
                 <th>Size</th>
               </thead>
-              <tbody>
-                
+              <tbody id="local_dir_display">
+                <!-- Local directory display -->
               </tbody>
             </table>
           </div>
         </div>
         <div class="col ml-0">
           <div class="bg-light text-dark" style="height: 450px; overflow: auto">
-            <table class="table table-sm text-dark">
+            <table class="table table-sm table-hover text-dark">
               <thead>
                 <th>Name</th>
                 <th>Type</th>
                 <th>Size</th>
               </thead>
-              <tbody class="table-hover">
-
+              <tbody id="remote_dir_display">
+                <!-- Remote directory display -->
               </tbody>
             </table>
           </div>
