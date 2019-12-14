@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const fs = require('fs');
 const ssh2Client = require('ssh2').Client;
 
@@ -11,19 +11,20 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
-const createWindow = () => {
+const createMainWindow = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     webPreferences: {
       nodeIntegration: true
     },
     width: 1280,
-    height: 850,
+    height: 900,
     minWidth: 1280,
-    minHeight: 850,
+    minHeight: 900,
     maxWidth: 1280,
-    maxHeight: 850,
+    maxHeight: 900,
     darkmode: true,
+    icon: __dirname + '/img/icon.png',
     show: false,
   });
 
@@ -47,7 +48,7 @@ const createWindow = () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+app.on('ready', createMainWindow);
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
@@ -62,6 +63,16 @@ app.on('activate', () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) {
-    createWindow();
+    createMainWindow();
   }
+});
+
+ipcMain.on('display_file_properties', (event, args) => {
+  dialog.showMessageBox({
+    type: 'info',
+    buttons: ['Close',],
+    title: 'Properties: ' + args[0],
+    message: args[1],
+    icon: __dirname + '/img/icon.png',
+  });
 });

@@ -10,13 +10,14 @@
       require('bootstrap');
       require('electron');
       require('electron').ipcRenderer;
+      require('electron').BrowserWindow;
     </script>
-    <script src="js/renderer/localDirRenderer.js"></script>
-    <script src="js/renderer/remoteDirRenderer.js"></script>
-    <script src="js/renderer/consoleRenderer.js"></script>
-    <script src="js/renderer/sftpRenderer/js"></script>
+    <script src="js/renderer/localDir.js"></script>
+    <script src="js/renderer/remoteDir.js"></script>
+    <script src="js/renderer/console.js"></script>
+    <script src="js/renderer/sftp.js"></script>
     <script type="text/javascript">
-      displayDirListing('/');
+      displayLocalDirListing('/');
     </script>
   </head>
   <body>
@@ -64,20 +65,22 @@
             <button id="button_local_delete" type="button" class="button">Delete</button>
             <button id="button_local_copy" type="button" class="button">Copy</button>
             <button id="button_local_cut" type="button" class="button">Cut</button>
+            <button id="button_local_cut" type="button" class="button">Paste</button>
             <button id="button_local_cut" type="button" class="button">Upload</button>
           </div>
         </div>
         <div class="col ml-3 pr-0">
           <div class="row pr-0">
-            <div class="col pl-2">
+            <div class="col-9 pl-2">
               <div class="input-group">
                 <button id="button_remote_delete" type="button" class="button">Delete</button>
                 <button id="button_remote_copy" type="button" class="button">Copy</button>
                 <button id="button_remote_cut" type="button" class="button">Cut</button>
+                <button id="button_local_cut" type="button" class="button">Paste</button>
                 <button id="button_remote_cut" type="button" class="button">Download</button>
               </div>
             </div>
-            <div class="col mr-0">
+            <div class="col-3 mr-0">
               <button id="button_remote_disconnect" type="button" class="button text-danger" style="float: right">Disconnect</button>
             </div>
           </div>
@@ -85,31 +88,39 @@
       </div>
       <div class="row mt-2">
         <div class="col mr-1">
-          <div class="bg-light text-dark" style="height: 450px; overflow: auto">
-            <table class="table table-sm table-hover text-dark">
-              <thead>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Size</th>
-              </thead>
-              <tbody id="local_dir_display">
-                <!-- Local directory display -->
-              </tbody>
-            </table>
+          <div class="row">
+            <div class="col">
+              <h6 id="local_cur_dir">Current directory:</h6>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="bg-light text-dark" style="height: 450px; overflow: auto">
+                <table class="table table-sm table-light text-dark">
+                  <tbody id="local_dir_display">
+                    <!-- Local directory display -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
         <div class="col ml-0">
-          <div class="bg-light text-dark" style="height: 450px; overflow: auto">
-            <table class="table table-sm table-hover text-dark">
-              <thead>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Size</th>
-              </thead>
-              <tbody id="remote_dir_display">
-                <!-- Remote directory display -->
-              </tbody>
-            </table>
+          <div class="row">
+            <div class="col">
+              <h6 id="remote_cur_dir">Current directory:</h6>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="bg-light text-dark" style="height: 450px; overflow: auto">
+                <table class="table table-sm table-light text-dark">
+                  <tbody id="remote_dir_display">
+                    <!-- Remote directory display -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -120,7 +131,7 @@
       </div>
       <div class="row">
         <div class="col">
-          <div id="console_output" class="bg-primary text-white" style="height: 75px; overflow: auto">
+          <div id="console_output" class="bg-primary text-white" style="height: 100px; overflow: auto">
             > SFTP Client initialized.
           </div>
         </div>
