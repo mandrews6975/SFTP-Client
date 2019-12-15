@@ -28,11 +28,11 @@
             <div class="input-group-prepend">
               <span class="input-group-text">Host:</span>
             </div>
-            <input id="input_host" type="text" class="form-control">
+            <input id="input_host" type="text" class="form-control" value="10.169.1.103">
             <div class="input-group-prepend input-group-append">
               <span class="input-group-text">Port:</span>
             </div>
-            <input id="input_host" type="text" class="form-control">
+            <input id="input_port" type="text" class="form-control" value="2222">
           </div>
         </div>
       </div>
@@ -42,12 +42,12 @@
             <div class="input-group-prepend">
               <span class="input-group-text">Username:</span>
             </div>
-            <input id="input_host" type="text" class="form-control">
+            <input id="input_username" type="text" class="form-control" value="root">
             <div class="input-group-prepend input-group-append">
               <span class="input-group-text">Password:</span>
             </div>
-            <input id="input_host" type="text" class="form-control">
-            <button id="button_connect" type="button" class="button">Connect</button>
+            <input id="input_password" type="password" class="form-control" value="dragooned">
+            <button id="button_connect" type="button" class="button" onclick="setConnectionSettings()">Connect</button>
           </div>
         </div>
       </div>
@@ -65,8 +65,9 @@
             <button id="button_local_delete" type="button" class="button">Delete</button>
             <button id="button_local_copy" type="button" class="button">Copy</button>
             <button id="button_local_cut" type="button" class="button">Cut</button>
-            <button id="button_local_cut" type="button" class="button">Paste</button>
-            <button id="button_local_cut" type="button" class="button">Upload</button>
+            <button id="button_local_paste" type="button" class="button">Paste</button>
+            <button id="button_local_new_dir" type="button" class="button">New Dir</button>
+            <button id="button_local_upload" type="button" class="button">Upload</button>
           </div>
         </div>
         <div class="col ml-3 pr-0">
@@ -76,12 +77,13 @@
                 <button id="button_remote_delete" type="button" class="button">Delete</button>
                 <button id="button_remote_copy" type="button" class="button">Copy</button>
                 <button id="button_remote_cut" type="button" class="button">Cut</button>
-                <button id="button_local_cut" type="button" class="button">Paste</button>
-                <button id="button_remote_cut" type="button" class="button">Download</button>
+                <button id="button_remote_paste" type="button" class="button">Paste</button>
+                <button id="button_remote_new_dir" type="button" class="button">New Dir</button>
+                <button id="button_remote_download" type="button" class="button">Download</button>
               </div>
             </div>
             <div class="col-3 mr-0">
-              <button id="button_remote_disconnect" type="button" class="button text-danger" style="float: right">Disconnect</button>
+              <button id="button_remote_disconnect" type="button" class="button text-danger" onclick="editConnectionSettings()" style="float: right" disabled>Disconnect</button>
             </div>
           </div>
         </div>

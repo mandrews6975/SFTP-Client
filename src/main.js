@@ -1,6 +1,6 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const fs = require('fs');
-const ssh2Client = require('ssh2').Client;
+const { Client, SFTPStream } = require('ssh2');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -67,6 +67,7 @@ app.on('activate', () => {
   }
 });
 
+// Display file properties dialog
 ipcMain.on('display_file_properties', (event, args) => {
   dialog.showMessageBox({
     type: 'info',
@@ -75,4 +76,33 @@ ipcMain.on('display_file_properties', (event, args) => {
     message: args[1],
     icon: __dirname + '/img/icon.png',
   });
+});
+
+// Store current SFTP connection
+let conn;
+
+// Get remote directory list
+ipcMain.on('get_remote_dir_list', (event, args) => {
+  conn = new Client();
+  conn.on('ready', () => {
+    conn.sftp((error1, sftp) => {
+      if(error1){
+        event.sender.send('sftp_message', error1);
+      }
+      sftp.readdir(args[1], (error2, list) => {
+        if(error2){
+          event.sender.send('sftp_message', error2);
+        }
+        newArgs = [];
+        newArgs.push(list);
+        let statsList = [];
+        for(let i = 0; i < list.length; i++){
+          statsList.push(list[i].attrs.isDirectory());
+        }
+        newArgs.push(statsList);
+        event.sender.send('remote_dir_list', newArgs);
+        conn.end();
+      });
+    });
+  }).connect(args[0]);
 });
