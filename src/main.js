@@ -78,11 +78,30 @@ ipcMain.on('display_file_properties', (event, args) => {
   });
 });
 
+// Store current local directory
+let curLocalDir;
+
+ipcMain.on('change_local_dir', (event, args) => {
+  curLocalDir = args;
+});
+
+ipcMain.on('get_cur_local_dir', (event, args) => {
+  event.sender.send('cur_local_dir', curLocalDir);
+});
+
+// Store current remote directory
+let curRemoteDir;
+
+ipcMain.on('get_cur_remote_dir', (event, args) => {
+  event.sender.send('cur_remote_dir', curRemoteDir);
+});
+
 // Store current SFTP connection
 let conn;
 
 // Get remote directory list
 ipcMain.on('get_remote_dir_list', (event, args) => {
+  curRemoteDir = args[1];
   conn = new Client();
   conn.on('ready', () => {
     conn.sftp((error1, sftp) => {
@@ -101,6 +120,28 @@ ipcMain.on('get_remote_dir_list', (event, args) => {
         }
         newArgs.push(statsList);
         event.sender.send('remote_dir_list', newArgs);
+        conn.end();
+      });
+    });
+  }).connect(args[0]);
+});
+
+// Download remote file
+ipcMain.on('download_remote_file', (event, args) => {
+  conn = new Client();
+  conn.on('ready', () => {
+    conn.sftp((error1, sftp) => {
+      if(error1){
+        event.sender.send('sftp_message', error1);
+      }
+      sftp.fastGet(args[1], curLocalDir + args[1].substring(args[1].lastIndexOf('/') + 1), {}, (error2) => {
+        if(error2){
+          event.sender.send('sftp_message', error2);
+        }
+        let tempArgs = [];
+        tempArgs.push(curLocalDir);
+        tempArgs.push(curRemoteDir);
+        event.sender.send('remote_download_complete', tempArgs);
         conn.end();
       });
     });

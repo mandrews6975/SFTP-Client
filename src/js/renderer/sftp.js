@@ -50,3 +50,35 @@ function getConnectionSettings(){
   }
   return connectionSettings;
 }
+
+function getCheckedRemotePaths(){
+  let arr = [];
+  let numElements = document.getElementById('remote_dir_display').children.length;
+  for(let i = 0; i < numElements; i++){
+    if(document.getElementById('remote_dir_display').children[i].children[0].children[0].checked){
+      arr.push(document.getElementById('remote_dir_display').children[i].children[0].children[0].value);
+    }
+  }
+  return arr;
+}
+
+function downloadFromServer(){
+  let paths = getCheckedRemotePaths();
+  let connectionSettings = getConnectionSettings();
+  for(let i = 0; i < paths.length; i++){
+    let tempArgs = [];
+    tempArgs.push(connectionSettings);
+    tempArgs.push(paths[i]);
+    cons.writeToConsole('Downloading ' + paths[i].substring(paths[i].lastIndexOf('/') + 1) + '...');
+    ipcRenderer.send('download_remote_file', tempArgs);
+    ipcRenderer.on('sftp_message', (event, args) => {
+      cons.writeToConsole(args[0]);
+    });
+    ipcRenderer.on('remote_download_complete', (event, args) => {
+      displayLocalDirListing(args[0]);
+      displayRemoteDirListing(args[1]);
+      cons.writeToConsole(paths[i].substring(paths[i].lastIndexOf('/') + 1) + ' downloaded to ' + args[0]);
+      return;
+    });
+  }
+}

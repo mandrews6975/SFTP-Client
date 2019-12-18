@@ -4,6 +4,7 @@ const util = require('util');
 const cons = require('./js/renderer/console.js');
 
 function displayLocalDirListing(path){
+  ipcRenderer.send('change_local_dir', path);
   fs.readdir(path, (error, files) => {
     if(error){
       cons.writeToConsole(error);
@@ -27,12 +28,6 @@ function displayLocalDirListing(path){
         let oldPath = path.substring(0, path.lastIndexOf('/', path.length - 2) + 1);
         displayLocalDirListing(oldPath);
       });
-      let details = document.createElement('img');
-      details.src = 'img/view_details.png';
-      details.style = 'float: right; width: 18px; height: 18px; margin-left: 3px; margin-right: 3px';
-      let checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.style = 'float: right; margin-top: 3px';
       name.appendChild(dir);
       row.appendChild(name);
       document.getElementById('local_dir_display').appendChild(row);
@@ -40,7 +35,11 @@ function displayLocalDirListing(path){
     for(let i = 0; i < files.length; i++){
       let row = document.createElement('tr');
       let name = document.createElement('td');
-      name.appendChild(document.createTextNode(files[i]));
+      let nameText = files[i];
+      if(nameText.length > 65){
+        nameText = nameText.substring(0, 62) + '...';
+      }
+      name.appendChild(document.createTextNode(nameText));
       fs.stat(path + files[i], (error, stats) => {
         if(error){
           cons.writeToConsole(error);
@@ -68,12 +67,12 @@ function displayLocalDirListing(path){
       let checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.style = 'float: right; margin-top: 3px';
+      checkbox.value = path + files[i];
       name.appendChild(checkbox);
       name.appendChild(details);
       row.appendChild(name);
       document.getElementById('local_dir_display').appendChild(row);
     }
-    cons.writeToConsole('Current local directory: ' + path);
     if(path.length > 55){
       let shortPath = path.substring(path.length - 59);
       shortPath = '...' + shortPath;

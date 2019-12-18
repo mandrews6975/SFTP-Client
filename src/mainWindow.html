@@ -16,6 +16,7 @@
     <script src="js/renderer/remoteDir.js"></script>
     <script src="js/renderer/console.js"></script>
     <script src="js/renderer/sftp.js"></script>
+    <script src="js/renderer/local.js"></script>
     <script type="text/javascript">
       displayLocalDirListing('/');
     </script>
@@ -79,7 +80,7 @@
                 <button id="button_remote_cut" type="button" class="button">Cut</button>
                 <button id="button_remote_paste" type="button" class="button">Paste</button>
                 <button id="button_remote_new_dir" type="button" class="button">New Dir</button>
-                <button id="button_remote_download" type="button" class="button">Download</button>
+                <button id="button_remote_download" type="button" class="button" onclick="downloadFromServer()">Download</button>
               </div>
             </div>
             <div class="col-3 mr-0">
@@ -133,7 +134,7 @@
       </div>
       <div class="row">
         <div class="col">
-          <div id="console_output" class="bg-primary text-white" style="height: 100px; overflow: auto">
+          <div id="console_output" class="bg-primary text-white" style="height: 100px; overflow: auto; font-size: 12px">
             > SFTP Client initialized.
           </div>
         </div>

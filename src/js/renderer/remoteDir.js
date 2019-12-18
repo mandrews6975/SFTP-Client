@@ -3,7 +3,6 @@ exports.displayRemoteDirListing = function(path){
 }
 
 function displayRemoteDirListing(path){
-  cons.writeToConsole('Current remote directory: ' + path);
   let args = [];
   args.push(getConnectionSettings());
   args.push(path);
@@ -31,12 +30,6 @@ function displayRemoteDirListing(path){
         let oldPath = path.substring(0, path.lastIndexOf('/', path.length - 2) + 1);
         displayRemoteDirListing(oldPath);
       });
-      let details = document.createElement('img');
-      details.src = 'img/view_details.png';
-      details.style = 'float: right; width: 18px; height: 18px; margin-left: 3px; margin-right: 3px';
-      let checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.style = 'float: right; margin-top: 3px';
       name.appendChild(dir);
       row.appendChild(name);
       document.getElementById('remote_dir_display').appendChild(row);
@@ -44,6 +37,11 @@ function displayRemoteDirListing(path){
     for(let i = 0; i < args[0].length; i++){
       let row = document.createElement('tr');
       let name = document.createElement('td');
+      let nameText = args[0][i].filename;
+      if(nameText.length > 65){
+        nameText = nameText.substring(0, 62) + '...';
+      }
+      name.appendChild(document.createTextNode(nameText));
       let details = document.createElement('img');
       details.src = 'img/view_details.png';
       details.style = 'float: right; width: 18px; height: 18px; margin-left: 3px; margin-right: 3px';
@@ -54,10 +52,10 @@ function displayRemoteDirListing(path){
       let checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.style = 'float: right; margin-top: 3px';
+      checkbox.value = path + args[0][i].filename;
       name.appendChild(checkbox);
       name.appendChild(details);
 
-      name.appendChild(document.createTextNode(args[0][i].filename));
       if(args[1][i]){
         let dir = document.createElement('img');
         dir.src = 'img/enter.png';
