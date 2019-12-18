@@ -185,7 +185,7 @@ ipcMain.on('make_remote_dir', (event, args) => {
         let tempArgs = [];
         tempArgs.push(curLocalDir);
         tempArgs.push(curRemoteDir);
-        tempArgs.push(name);
+        tempArgs.push(args[1]);
         event.sender.send('remote_dir_made', tempArgs);
         conn.end();
       });
