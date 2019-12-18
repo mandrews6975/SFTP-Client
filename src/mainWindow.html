@@ -11,6 +11,7 @@
       require('electron');
       require('electron').ipcRenderer;
       require('electron').BrowserWindow;
+      require('dialogs');
     </script>
     <script src="js/renderer/localDir.js"></script>
     <script src="js/renderer/remoteDir.js"></script>
@@ -68,7 +69,7 @@
             <button id="button_local_cut" type="button" class="button">Cut</button>
             <button id="button_local_paste" type="button" class="button">Paste</button>
             <button id="button_local_new_dir" type="button" class="button">New Dir</button>
-            <button id="button_local_upload" type="button" class="button">Upload</button>
+            <button id="button_local_upload" type="button" class="button" onclick="uploadToServer()">Upload</button>
           </div>
         </div>
         <div class="col ml-3 pr-0">
@@ -79,7 +80,7 @@
                 <button id="button_remote_copy" type="button" class="button">Copy</button>
                 <button id="button_remote_cut" type="button" class="button">Cut</button>
                 <button id="button_remote_paste" type="button" class="button">Paste</button>
-                <button id="button_remote_new_dir" type="button" class="button">New Dir</button>
+                <button id="button_remote_new_dir" type="button" class="button" onclick="makeRemoteDir()">New Dir</button>
                 <button id="button_remote_download" type="button" class="button" onclick="downloadFromServer()">Download</button>
               </div>
             </div>

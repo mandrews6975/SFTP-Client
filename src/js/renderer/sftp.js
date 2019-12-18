@@ -1,4 +1,5 @@
 const remoteDir = require('./js/renderer/remoteDir.js');
+const local = require('./js/renderer/local.js');
 
 function setConnectionSettings(){
   let host = document.getElementById('input_host');
@@ -82,3 +83,37 @@ function downloadFromServer(){
     });
   }
 }
+
+function uploadToServer(){
+  let paths = local.getCheckedLocalPaths();
+  let connectionSettings = getConnectionSettings();
+  for(let i = 0; i < paths.length; i++){
+    let tempArgs = [];
+    tempArgs.push(connectionSettings);
+    tempArgs.push(paths[i]);
+    cons.writeToConsole('Uploading ' + paths[i].substring(paths[i].lastIndexOf('/') + 1) + '...');
+    ipcRenderer.send('upload_local_file', tempArgs);
+    ipcRenderer.on('sftp_message', (event, args) => {
+      cons.writeToConsole(args[0]);
+    });
+    ipcRenderer.on('local_upload_complete', (event, args) => {
+      displayLocalDirListing(args[0]);
+      displayRemoteDirListing(args[1]);
+      cons.writeToConsole(paths[i].substring(paths[i].lastIndexOf('/') + 1) + ' uploaded to ' + args[1]);
+      return;
+    });
+  }
+}
+
+/*function makeRemoteDir(){ FIXME
+  let connectionSettings = getConnectionSettings();
+    let tempArgs = [];
+    tempArgs.push(connectionSettings);
+    tempArgs.push(name);
+    ipcRenderer.send('make_remote_dir', tempArgs);
+    ipcRenderer.on('remote_dir_made', (event, args) => {
+      displayLocalDirListing(args[0]);
+      displayRemoteDirListing(args[1]);
+      cons.writeToConsole('Remote directory ' + args[2] + ' made.')
+    });
+}*/

@@ -126,7 +126,7 @@ ipcMain.on('get_remote_dir_list', (event, args) => {
   }).connect(args[0]);
 });
 
-// Download remote file
+// Download remote file from server
 ipcMain.on('download_remote_file', (event, args) => {
   conn = new Client();
   conn.on('ready', () => {
@@ -142,6 +142,51 @@ ipcMain.on('download_remote_file', (event, args) => {
         tempArgs.push(curLocalDir);
         tempArgs.push(curRemoteDir);
         event.sender.send('remote_download_complete', tempArgs);
+        conn.end();
+      });
+    });
+  }).connect(args[0]);
+});
+
+// Upload local file to server
+ipcMain.on('upload_local_file', (event, args) => {
+  conn = new Client();
+  conn.on('ready', () => {
+    conn.sftp((error1, sftp) => {
+      if(error1){
+        event.sender.send('sftp_message', error1);
+      }
+      sftp.fastPut(args[1], curRemoteDir + args[1].substring(args[1].lastIndexOf('/') + 1), {}, (error2) => {
+        if(error2){
+          event.sender.send('sftp_message', error2);
+        }
+        let tempArgs = [];
+        tempArgs.push(curLocalDir);
+        tempArgs.push(curRemoteDir);
+        event.sender.send('local_upload_complete', tempArgs);
+        conn.end();
+      });
+    });
+  }).connect(args[0]);
+});
+
+// Make remote directory
+ipcMain.on('make_remote_dir', (event, args) => {
+  conn = new Client();
+  conn.on('ready', () => {
+    conn.sftp((error1, sftp) => {
+      if(error1){
+        event.sender.send('sftp_message', error1);
+      }
+      sftp.mkdir(args[1], (error2) => {
+        if(error2){
+          event.sender.send('sftp_message', error2);
+        }
+        let tempArgs = [];
+        tempArgs.push(curLocalDir);
+        tempArgs.push(curRemoteDir);
+        tempArgs.push(name);
+        event.sender.send('remote_dir_made', tempArgs);
         conn.end();
       });
     });
