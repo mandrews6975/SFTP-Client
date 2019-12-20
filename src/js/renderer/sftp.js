@@ -66,54 +66,59 @@ function getCheckedRemotePaths(){
 function downloadFromServer(){
   let paths = getCheckedRemotePaths();
   let connectionSettings = getConnectionSettings();
-  for(let i = 0; i < paths.length; i++){
-    let tempArgs = [];
-    tempArgs.push(connectionSettings);
-    tempArgs.push(paths[i]);
-    cons.writeToConsole('Downloading ' + paths[i].substring(paths[i].lastIndexOf('/') + 1) + '...');
-    ipcRenderer.send('download_remote_file', tempArgs);
-    ipcRenderer.on('sftp_message', (event, args) => {
-      cons.writeToConsole(args[0]);
-    });
-    ipcRenderer.on('remote_download_complete', (event, args) => {
-      displayLocalDirListing(args[0]);
-      displayRemoteDirListing(args[1]);
-      cons.writeToConsole(paths[i].substring(paths[i].lastIndexOf('/') + 1) + ' downloaded to ' + args[0]);
-      return;
-    });
+  let tempArgs = [];
+  tempArgs.push(connectionSettings);
+  tempArgs.push(paths);
+  if(paths.length > 1){
+    cons.writeToConsole('Downloading files...');
+  }else{
+    cons.writeToConsole('Downloading ' + paths[0].substring(paths[0].lastIndexOf('/') + 1) + '...');
   }
+  ipcRenderer.send('download_remote_files', tempArgs);
+  ipcRenderer.on('remote_download_complete', (event, args) => {
+    displayLocalDirListing(args[0]);
+    displayRemoteDirListing(args[1]);
+    if(paths.length > 1){
+      cons.writeToConsole('Files downloaded to ' + args[0] + '.');
+    }else{
+      cons.writeToConsole(paths[0].substring(paths[0].lastIndexOf('/') + 1) + ' downloaded to ' + args[0] + '.');
+    }
+  });
 }
 
 function uploadToServer(){
   let paths = local.getCheckedLocalPaths();
   let connectionSettings = getConnectionSettings();
-  for(let i = 0; i < paths.length; i++){
-    let tempArgs = [];
-    tempArgs.push(connectionSettings);
-    tempArgs.push(paths[i]);
-    cons.writeToConsole('Uploading ' + paths[i].substring(paths[i].lastIndexOf('/') + 1) + '...');
-    ipcRenderer.send('upload_local_file', tempArgs);
-    ipcRenderer.on('sftp_message', (event, args) => {
-      cons.writeToConsole(args[0]);
-    });
-    ipcRenderer.on('local_upload_complete', (event, args) => {
-      displayLocalDirListing(args[0]);
-      displayRemoteDirListing(args[1]);
-      cons.writeToConsole(paths[i].substring(paths[i].lastIndexOf('/') + 1) + ' uploaded to ' + args[1]);
-      return;
-    });
+  if(paths.length > 1){
+    cons.writeToConsole('Uploading files...');
+  }else{
+    cons.writeToConsole('Uploading ' + paths[0].substring(paths[0].lastIndexOf('/') + 1) + '...');
   }
+  let tempArgs = [];
+  tempArgs.push(connectionSettings);
+  tempArgs.push(paths);
+  ipcRenderer.send('upload_local_files', tempArgs);
+  ipcRenderer.on('local_upload_complete', (event, args) => {
+    displayLocalDirListing(args[0]);
+    displayRemoteDirListing(args[1]);
+    if(paths.length > 1){
+      cons.writeToConsole('Files uploaded to ' + args[1] + '.');
+    }else{
+      cons.writeToConsole(paths[0].substring(paths[0].lastIndexOf('/') + 1) + ' uploaded to ' + args[1] + '.');
+    }
+  });
 }
 
-/*function makeRemoteDir(){ FIXME
+function makeRemoteDir(){
   let connectionSettings = getConnectionSettings();
-    let tempArgs = [];
-    tempArgs.push(connectionSettings);
-    tempArgs.push(name);
-    ipcRenderer.send('make_remote_dir', tempArgs);
-    ipcRenderer.on('remote_dir_made', (event, args) => {
-      displayLocalDirListing(args[0]);
-      displayRemoteDirListing(args[1]);
-      cons.writeToConsole('Remote directory ' + args[2] + ' made.')
-    });
-}*/
+  let tempArgs = [];
+  tempArgs.push(connectionSettings);
+  tempArgs.push(document.getElementById('input_new_remote_dir').value);
+  document.getElementById('input_new_remote_dir').value = '';
+  ipcRenderer.send('make_remote_dir', tempArgs);
+  ipcRenderer.on('remote_dir_made', (event, args) => {
+    displayLocalDirListing(args[0]);
+    displayRemoteDirListing(args[1]);
+    cons.writeToConsole('Remote directory ' + args[2] + ' made.')
+  });
+}

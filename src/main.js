@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const fs = require('fs');
 const { Client, SFTPStream } = require('ssh2');
+const PromisePool = require('es6-promise-pool');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -96,22 +97,15 @@ ipcMain.on('get_cur_remote_dir', (event, args) => {
   event.sender.send('cur_remote_dir', curRemoteDir);
 });
 
-// Store current SFTP connection
-let conn;
+let counter = 0;
 
 // Get remote directory list
 ipcMain.on('get_remote_dir_list', (event, args) => {
   curRemoteDir = args[1];
-  conn = new Client();
+  let conn = new Client();
   conn.on('ready', () => {
-    conn.sftp((error1, sftp) => {
-      if(error1){
-        event.sender.send('sftp_message', error1);
-      }
-      sftp.readdir(args[1], (error2, list) => {
-        if(error2){
-          event.sender.send('sftp_message', error2);
-        }
+    conn.sftp((error, sftp) => {
+      sftp.readdir(args[1], (error, list) => {
         newArgs = [];
         newArgs.push(list);
         let statsList = [];
@@ -127,61 +121,96 @@ ipcMain.on('get_remote_dir_list', (event, args) => {
 });
 
 // Download remote file from server
-ipcMain.on('download_remote_file', (event, args) => {
-  conn = new Client();
+ipcMain.on('download_remote_files', (event, args) => {
+  let conn = new Client();
   conn.on('ready', () => {
-    conn.sftp((error1, sftp) => {
-      if(error1){
-        event.sender.send('sftp_message', error1);
-      }
-      sftp.fastGet(args[1], curLocalDir + args[1].substring(args[1].lastIndexOf('/') + 1), {}, (error2) => {
-        if(error2){
-          event.sender.send('sftp_message', error2);
-        }
-        let tempArgs = [];
-        tempArgs.push(curLocalDir);
-        tempArgs.push(curRemoteDir);
-        event.sender.send('remote_download_complete', tempArgs);
-        conn.end();
-      });
+    let pool = new PromisePool(downloadFileProducer(conn, args[1]), 10);
+    pool.start().then(() => {
+      counter = 0;
+      let tempArgs = [];
+      tempArgs.push(curLocalDir);
+      tempArgs.push(curRemoteDir);
+      event.sender.send('remote_download_complete', tempArgs);
     });
   }).connect(args[0]);
 });
 
-// Upload local file to server
-ipcMain.on('upload_local_file', (event, args) => {
-  conn = new Client();
-  conn.on('ready', () => {
-    conn.sftp((error1, sftp) => {
-      if(error1){
-        event.sender.send('sftp_message', error1);
-      }
-      sftp.fastPut(args[1], curRemoteDir + args[1].substring(args[1].lastIndexOf('/') + 1), {}, (error2) => {
-        if(error2){
-          event.sender.send('sftp_message', error2);
-        }
-        let tempArgs = [];
-        tempArgs.push(curLocalDir);
-        tempArgs.push(curRemoteDir);
-        event.sender.send('local_upload_complete', tempArgs);
+// Producer used in promise pool to download files
+function downloadFileProducer(conn, files){
+  if(counter < 100 && counter < files.length){
+    counter++;
+    return(downloadFile(conn, connectionSettings, files[counter - 1]));
+  }else{
+    return null;
+  }
+}
+
+// Function used to download files in promise pool
+function downloadFile(conn,  file){
+  return new Promise((resolve, reject) => {
+    conn.sftp((error, sftp) => {
+      return sftp.fastGet(file, curLocalDir + file.substring(file.lastIndexOf('/') + 1), {}, () => {
         conn.end();
+        resolve(file);
       });
     });
+  });
+}
+
+// Upload local file to server
+ipcMain.on('upload_local_files', (event, args) => {
+  let conn = new Client();
+  conn.on('ready', () => {
+    let pool = new PromisePool(uploadFileProducer(conn, args[1]), 10);
+    pool.start().then(() => {
+      counter = 0;
+      let tempArgs = [];
+      tempArgs.push(curLocalDir);
+      tempArgs.push(curRemoteDir);
+      event.sender.send('local_upload_complete', tempArgs);
+    });
   }).connect(args[0]);
+});
+
+// Producer used in promise pool to upload files
+function uploadFileProducer(conn, files){
+  if(counter < 100 && counter < files.length){
+    counter++;
+    return(uploadFile(conn, files[counter - 1]));
+  }else{
+    return null;
+  }
+}
+
+// Function used to upload files in promise pool
+function uploadFile(conn, file){
+  return new Promise((resolve, reject) => {
+    conn.sftp((error, sftp) => {
+      return sftp.fastPut(file, curRemoteDir + file.substring(file.lastIndexOf('/') + 1), {}, (error) => {
+        conn.end();
+        resolve(file);
+      });
+    });
+  });
+}
+
+// Make local directory
+ipcMain.on('make_local_dir', (event, args) => {
+  fs.mkdir(curLocalDir + args[0], () => {
+    let tempArgs = [];
+    tempArgs.push(curLocalDir);
+    tempArgs.push(curRemoteDir);
+    tempArgs.push(args[1]);
+    event.sender.send('local_dir_made', tempArgs);
+  });
 });
 
 // Make remote directory
 ipcMain.on('make_remote_dir', (event, args) => {
-  conn = new Client();
+  let conn = new Client();
   conn.on('ready', () => {
-    conn.sftp((error1, sftp) => {
-      if(error1){
-        event.sender.send('sftp_message', error1);
-      }
-      sftp.mkdir(args[1], (error2) => {
-        if(error2){
-          event.sender.send('sftp_message', error2);
-        }
+    conn.sftp((error, sftp) => {
+      sftp.mkdir(curRemoteDir + args[1], (error) => {
         let tempArgs = [];
         tempArgs.push(curLocalDir);
         tempArgs.push(curRemoteDir);

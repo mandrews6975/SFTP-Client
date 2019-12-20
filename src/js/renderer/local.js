@@ -12,3 +12,15 @@ function getCheckedLocalPaths(){
   }
   return arr;
 }
+
+function makeLocalDir(){
+  let tempArgs = [];
+  tempArgs.push(document.getElementById('input_new_local_dir').value);
+  document.getElementById('input_new_local_dir').value = '';
+  ipcRenderer.send('make_local_dir', tempArgs);
+  ipcRenderer.on('local_dir_made', (event, args) => {
+    displayLocalDirListing(args[0]);
+    displayRemoteDirListing(args[1]);
+    cons.writeToConsole('Local directory ' + args[2] + ' made.')
+  });
+}
