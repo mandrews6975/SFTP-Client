@@ -126,31 +126,29 @@ ipcMain.on('download_remote_files', (event, args) => {
   conn.on('ready', () => {
     let pool = new PromisePool(downloadFileProducer(conn, args[1]), 10);
     pool.start().then(() => {
+      conn.end();
       counter = 0;
       let tempArgs = [];
       tempArgs.push(curLocalDir);
       tempArgs.push(curRemoteDir);
+      tempArgs.push(args[1].length);
       event.sender.send('remote_download_complete', tempArgs);
     });
   }).connect(args[0]);
 });
 
 // Producer used in promise pool to download files
-function downloadFileProducer(conn, files){
-  if(counter < 100 && counter < files.length){
-    counter++;
-    return(downloadFile(conn, connectionSettings, files[counter - 1]));
-  }else{
-    return null;
+function *downloadFileProducer(conn, files){
+  for(const file of files){
+    yield downloadFile(conn, file);
   }
 }
 
 // Function used to download files in promise pool
-function downloadFile(conn,  file){
+function downloadFile(conn, file){
   return new Promise((resolve, reject) => {
     conn.sftp((error, sftp) => {
       return sftp.fastGet(file, curLocalDir + file.substring(file.lastIndexOf('/') + 1), {}, () => {
-        conn.end();
         resolve(file);
       });
     });
@@ -163,22 +161,21 @@ ipcMain.on('upload_local_files', (event, args) => {
   conn.on('ready', () => {
     let pool = new PromisePool(uploadFileProducer(conn, args[1]), 10);
     pool.start().then(() => {
+      conn.end();
       counter = 0;
       let tempArgs = [];
       tempArgs.push(curLocalDir);
       tempArgs.push(curRemoteDir);
+      tempArgs.push(args[1].length);
       event.sender.send('local_upload_complete', tempArgs);
     });
   }).connect(args[0]);
 });
 
 // Producer used in promise pool to upload files
-function uploadFileProducer(conn, files){
-  if(counter < 100 && counter < files.length){
-    counter++;
-    return(uploadFile(conn, files[counter - 1]));
-  }else{
-    return null;
+function *uploadFileProducer(conn, files){
+  for(const file of files){
+    yield uploadFile(conn, file);
   }
 }
 
@@ -187,7 +184,6 @@ function uploadFile(conn, file){
   return new Promise((resolve, reject) => {
     conn.sftp((error, sftp) => {
       return sftp.fastPut(file, curRemoteDir + file.substring(file.lastIndexOf('/') + 1), {}, (error) => {
-        conn.end();
         resolve(file);
       });
     });

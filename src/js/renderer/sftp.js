@@ -78,7 +78,7 @@ function downloadFromServer(){
   ipcRenderer.on('remote_download_complete', (event, args) => {
     displayLocalDirListing(args[0]);
     displayRemoteDirListing(args[1]);
-    if(paths.length > 1){
+    if(args[2] > 1){
       cons.writeToConsole('Files downloaded to ' + args[0] + '.');
     }else{
       cons.writeToConsole(paths[0].substring(paths[0].lastIndexOf('/') + 1) + ' downloaded to ' + args[0] + '.');
@@ -101,7 +101,7 @@ function uploadToServer(){
   ipcRenderer.on('local_upload_complete', (event, args) => {
     displayLocalDirListing(args[0]);
     displayRemoteDirListing(args[1]);
-    if(paths.length > 1){
+    if(args[2] > 1){
       cons.writeToConsole('Files uploaded to ' + args[1] + '.');
     }else{
       cons.writeToConsole(paths[0].substring(paths[0].lastIndexOf('/') + 1) + ' uploaded to ' + args[1] + '.');
