@@ -13,6 +13,11 @@ function setConnectionSettings(){
     password.readOnly = true;
     document.getElementById('button_connect').disabled = true;
     document.getElementById('button_remote_disconnect').disabled = false;
+    document.getElementById('button_local_upload').disabled = false;
+    document.getElementById('button_remote_copy').disabled = false;
+    // document.getElementById('button_remote_cut').disabled = false;
+    document.getElementById('button_remote_download').disabled = false;
+    document.getElementById('button_remote_new_dir').disabled = false;
     cons.writeToConsole('Connection settings: ' + username.value + '@' + host.value + ':' + port.value + ' established.');
     remoteDir.displayRemoteDirListing('/');
     ipcRenderer.on('sftp_message', (event, args) => {
@@ -33,6 +38,12 @@ function editConnectionSettings(){
     password.readOnly = false;
     document.getElementById('button_connect').disabled = false;
     document.getElementById('button_remote_disconnect').disabled = true;
+    document.getElementById('button_local_upload').disabled = true;
+    document.getElementById('button_remote_copy').disabled = true;
+    // document.getElementById('button_remote_cut').disabled = true;
+    document.getElementById('button_remote_paste').disabled = true;
+    document.getElementById('button_remote_download').disabled = true;
+    document.getElementById('button_remote_new_dir').disabled = true;
     cons.writeToConsole('Connection settings now editable.');
     let numElements = document.getElementById('remote_dir_display').children.length;
     for(let i = 0; i < numElements; i++){
@@ -76,7 +87,6 @@ function downloadFromServer(){
   }
   ipcRenderer.send('download_remote_files', tempArgs);
   ipcRenderer.on('remote_download_complete', (event, args) => {
-    displayLocalDirListing(args[0]);
     displayRemoteDirListing(args[1]);
     if(args[2] > 1){
       cons.writeToConsole('Files downloaded to ' + args[0] + '.');
@@ -99,7 +109,6 @@ function uploadToServer(){
   tempArgs.push(paths);
   ipcRenderer.send('upload_local_files', tempArgs);
   ipcRenderer.on('local_upload_complete', (event, args) => {
-    displayLocalDirListing(args[0]);
     displayRemoteDirListing(args[1]);
     if(args[2] > 1){
       cons.writeToConsole('Files uploaded to ' + args[1] + '.');
@@ -109,6 +118,20 @@ function uploadToServer(){
   });
 }
 
+/*function deleteRemoteDir(){
+  let paths = getCheckedRemotePaths();
+  let connectionSettings = getConnectionSettings();
+  let tempArgs = [];
+  tempArgs.push(connectionSettings);
+  tempArgs.push(paths);
+  ipcRenderer.send('delete_remote_files', tempArgs);
+  ipcRenderer.on('remote_files_deleted', (event, args) => {
+    displayLocalDirListing(args[0]);
+    displayRemoteDirListing(args[1]);
+    cons.writeToConsole('Remote file(s) deleted.')
+  });
+}*/
+
 function makeRemoteDir(){
   let connectionSettings = getConnectionSettings();
   let tempArgs = [];
@@ -117,8 +140,28 @@ function makeRemoteDir(){
   document.getElementById('input_new_remote_dir').value = '';
   ipcRenderer.send('make_remote_dir', tempArgs);
   ipcRenderer.on('remote_dir_made', (event, args) => {
-    displayLocalDirListing(args[0]);
     displayRemoteDirListing(args[1]);
     cons.writeToConsole('Remote directory ' + args[2] + ' made.')
+  });
+}
+
+function copyRemoteFiles(){
+  document.getElementById('button_remote_paste').disabled = false;
+  let files = getCheckedRemotePaths();
+  ipcRenderer.send('copy_remote_files', files);
+}
+
+/*function cutRemoteFiles(){
+  document.getElementById('button_remote_paste').disabled = false;
+  let files = getCheckedRemotePaths();
+  ipcRenderer.send('cut_remote_files', files);
+}*/
+
+function pasteRemoteFiles(){
+  let connectionSettings = getConnectionSettings();
+  ipcRenderer.send('paste_remote_files', connectionSettings);
+  ipcRenderer.on('remote_files_pasted', (event, args) => {
+    displayRemoteDirListing(args[1]);
+    cons.writeToConsole('Remote file(s) pasted in ' + args[1] + '.');
   });
 }

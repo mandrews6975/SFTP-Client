@@ -64,6 +64,58 @@
         </div>
       </div>
     </div>
+    <div class="modal fade" id="modal_remote_paste" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h6 class="modal-title">Paste copied/cut remote file(s)? File(s) with same name(s) will be overwritten.</h6>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="button" data-dismiss="modal">Cancel</button>
+            <button type="button" class="button" data-dismiss="modal" onclick="pasteRemoteFiles()">Confirm</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="modal_local_paste" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h6 class="modal-title">Paste copied/cut local file(s)? File(s) with same name(s) will be overwritten.</h6>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="button" data-dismiss="modal">Cancel</button>
+            <button type="button" class="button" data-dismiss="modal" onclick="pasteLocalFiles()">Confirm</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="modal_delete_remote_dir" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h6 class="modal-title">Delete remote file(s)?</h6>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="button" data-dismiss="modal">Cancel</button>
+            <button type="button" class="button" data-dismiss="modal" onclick="deleteRemoteDir()">Confirm</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="modal_delete_local_dir" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h6 class="modal-title">Delete local file(s)?</h6>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="button" data-dismiss="modal">Cancel</button>
+            <button type="button" class="button" data-dismiss="modal" onclick="deleteLocalDir()">Confirm</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="container-fluid">
       <div class="row mt-3">
         <div class="col">
@@ -105,24 +157,24 @@
       <div class="row mt-0 mb-0 ml-0 mr-0 pr-0 bg-light">
         <div class="col pl-0">
           <div class="input-group">
-            <button id="button_local_delete" type="button" class="button">Delete</button>
-            <button id="button_local_copy" type="button" class="button">Copy</button>
-            <button id="button_local_cut" type="button" class="button">Cut</button>
-            <button id="button_local_paste" type="button" class="button">Paste</button>
+            <!-- <button id="button_local_delete" type="button" class="button" data-toggle="modal" data-target="#modal_delete_local_dir">Delete</button> -->
+            <button id="button_local_copy" type="button" class="button" onclick="copyLocalFiles()">Copy</button>
+            <!-- <button id="button_local_cut" type="button" class="button" onclick="cutLocalFiles()">Cut</button> -->
+            <button id="button_local_paste" type="button" class="button" data-toggle="modal" data-target="#modal_local_paste" disabled>Paste</button>
             <button id="button_local_new_dir" type="button" class="button" data-toggle="modal" data-target="#modal_new_local_dir">New Dir</button>
-            <button id="button_local_upload" type="button" class="button" onclick="uploadToServer()">Upload</button>
+            <button id="button_local_upload" type="button" class="button" onclick="uploadToServer()" disabled>Upload</button>
           </div>
         </div>
         <div class="col ml-3 pr-0">
           <div class="row pr-0">
             <div class="col-9 pl-2">
               <div class="input-group">
-                <button id="button_remote_delete" type="button" class="button">Delete</button>
-                <button id="button_remote_copy" type="button" class="button">Copy</button>
-                <button id="button_remote_cut" type="button" class="button">Cut</button>
-                <button id="button_remote_paste" type="button" class="button">Paste</button>
-                <button id="button_remote_new_dir" type="button" class="button" data-toggle="modal" data-target="#modal_new_remote_dir">New Dir</button>
-                <button id="button_remote_download" type="button" class="button" onclick="downloadFromServer()">Download</button>
+                <!-- <button id="button_remote_delete" type="button" class="button" data-toggle="modal" data-target="#modal_delete_remote_dir">Delete</button> -->
+                <button id="button_remote_copy" type="button" class="button" onclick="copyRemoteFiles()" disabled>Copy</button>
+                <!-- <button id="button_remote_cut" type="button" class="button" onclick="cutRemoteFiles()" disabled>Cut</button> -->
+                <button id="button_remote_paste" type="button" class="button" data-toggle="modal" data-target="#modal_remote_paste" disabled>Paste</button>
+                <button id="button_remote_new_dir" type="button" class="button" data-toggle="modal" data-target="#modal_new_remote_dir" disabled>New Dir</button>
+                <button id="button_remote_download" type="button" class="button" onclick="downloadFromServer()" disabled>Download</button>
               </div>
             </div>
             <div class="col-3 mr-0">
@@ -176,7 +228,7 @@
       </div>
       <div class="row">
         <div class="col">
-          <div id="console_output" class="bg-primary text-white" style="height: 100px; overflow: auto; font-size: 12px">
+          <div id="console_output" class="bg-primary text-white" style="height: 130px; overflow: auto; font-size: 12px">
             > SFTP Client initialized.
           </div>
         </div>
